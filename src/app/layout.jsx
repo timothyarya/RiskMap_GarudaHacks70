@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
       <body className="min-h-dvh w-full">
         <Navbar />
         <main
-        className="flex flex-row min-h-dvh px-32 py-30"
+        className="flex flex-row justify-center items-top w-full min-h-dvh"
         >
           {children}
         </main>
