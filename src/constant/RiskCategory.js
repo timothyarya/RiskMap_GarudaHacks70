@@ -1,0 +1,1 @@
+export const RiskCategory = ["Criminal", "Natural Disaster", "Accident", "Other"]

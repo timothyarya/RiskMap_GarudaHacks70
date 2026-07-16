@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { MapContainer, Circle, TileLayer, useMapEvents } from "react-leaflet"
 import ReportPanel from "./ReportPanel"
+import FormReportModal from "./FormReportModal"
 import 'leaflet/dist/leaflet.css'
 
 function LocationSelector({ setHazardCenter }) {
@@ -18,13 +19,81 @@ export default function RiskMap() {
     const [riskPoint, setRiskPoint] = useState(null)
     const [radius, setRadius] = useState(500)
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [locationName, setLocationName] = useState('');   
+    const [description, setDescription] = useState('');
+    const [reporting, setReporting] = useState(false);
+
+    const fetchLocationName = async (lat, lng) => {
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1`);
+            const data = await response.json();
+
+            if (data && data.display_name) {
+
+                const address = data.address
+                const shortName = `${address.village || address.suburb || address.town || ''}, ${address.city || address.county || ''}`.replace(/^, /, '');
+                setLocationName(shortName || data.display_name);
+            } else {
+                setLocationName('Unknown Location');
+            }
+        } catch (error) {
+            console.log('Error fetching location name:', error);
+            setLocationName('Failed to get location');
+        }
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        const formData = new FormData(e.target)
+        const category = formData.get('category')
+
+        const finalData = {
+            category: category,
+            location: locationName,
+            description: description,
+            lat: riskPoint.lat,
+            lng: riskPoint.lng,
+            radius: radius
+        }
+
+        console.log(finalData)
+        setReporting(true)
+        setIsModalOpen(false)
+        setDescription('')
+    }
+
     return (
         <div
         className="flex flex-col gap-5 w-full"
         >
+                {
+                    isModalOpen && 
+                    <FormReportModal
+                        closeModal={() => {
+                            setIsModalOpen(false)
+                            setRiskPoint(null)
+                            setDescription('')
+                        }}
+                        riskPoint={riskPoint} 
+                        locationName={locationName} 
+                        description={description} 
+                        setDescription={(desc) => {
+                            setDescription(desc)
+                        }}
+                        reporting={reporting}
+                        setReporting={setReporting}
+                        submitHandler={(e) => handleSubmit(e)}
+                    />
+                }
                 <ReportPanel
                     value={radius}
                     setValue={(rad) => setRadius(rad)}
+                    riskPointAvail={riskPoint}
+                    openModal={() => {
+                        setIsModalOpen(true)
+                        fetchLocationName(riskPoint.lat, riskPoint.lng)
+                    }}
                 />
                 <MapContainer 
                     center={[-6.200000, 106.816666]}
@@ -48,4 +117,4 @@ export default function RiskMap() {
                 </MapContainer>
         </div>
     )
-}
+}   
