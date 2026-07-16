@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { MapContainer, Circle, TileLayer, useMapEvents } from "react-leaflet"
 import 'leaflet/dist/leaflet.css'
 
@@ -16,6 +16,28 @@ function LocationSelector({ setHazardCenter }) {
 export default function RiskMap() {
     const [riskPoint, setRiskPoint] = useState(null)
     const [radius, setRadius] = useState(500)
+    const [allReports, setAllReports] = useState([])
+
+    useEffect(() => {
+        const fetchReports = async () => {
+            try {
+                const response = await fetch('/api/reports', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    setAllReports(result.data);
+                }
+            } catch (error) {
+                console.error('Error fetching reports:', error);
+            }
+        }
+
+        fetchReports();
+    }, [])
 
     return (
         <div
@@ -30,6 +52,19 @@ export default function RiskMap() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     attribution='&copy; OpenStreetMap contributors'
                 />
+
+                {
+                    allReports.map((report) => {
+                        return (
+                            <Circle 
+                            key={report._id}
+                            center={[report.latitude, report.longitude]} 
+                            radius={report.radius} 
+                            pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: 0.4 }} 
+                            />
+                        )
+                    })
+                }
             </MapContainer>
         </div>
     )

@@ -23,6 +23,29 @@ export default function RiskMap() {
     const [locationName, setLocationName] = useState('');   
     const [description, setDescription] = useState('');
     const [reporting, setReporting] = useState(false);
+    
+    const [allReports, setAllReports] = useState([])
+    
+        useEffect(() => {
+            const fetchReports = async () => {
+                try {
+                    const response = await fetch('/api/reports', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        setAllReports(result.data);
+                    }
+                } catch (error) {
+                    console.error('Error fetching reports:', error);
+                }
+            }
+    
+            fetchReports();
+        }, [])
 
     const fetchLocationName = async (lat, lng) => {
         try {
@@ -44,7 +67,7 @@ export default function RiskMap() {
     }
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        // e.preventDefault()
         const formData = new FormData(e.target)
         const category = formData.get('category')
 
@@ -52,15 +75,34 @@ export default function RiskMap() {
             category: category,
             location: locationName,
             description: description,
-            lat: riskPoint.lat,
-            lng: riskPoint.lng,
+            latitude: riskPoint.lat,
+            longitude: riskPoint.lng,
             radius: radius
         }
 
-        console.log(finalData)
-        setReporting(true)
-        setIsModalOpen(false)
-        setDescription('')
+        // console.log(finalData)
+        try {
+            const response = await fetch('/api/reports', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(finalData)
+            })
+
+            if (response.ok) {
+                alert('Report submitted successfully to MongoDB');
+                setRiskPoint(null)
+                setIsModalOpen(false)
+                setDescription('')
+            } else {
+                alert('Failed to submit report to MongoDB');
+            }
+        } catch (error) {
+            console.error("Error submitting report:", error);
+        } finally {
+            setReporting(false)
+        }
     }
 
     return (
@@ -107,13 +149,28 @@ export default function RiskMap() {
                     
                     <LocationSelector setHazardCenter={setRiskPoint} />
 
-                    {riskPoint && (
-                    <Circle 
-                        center={riskPoint} 
-                        radius={radius} 
-                        pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: 0.4 }} 
-                    />
-                    )}
+                    {
+                        riskPoint && (
+                        <Circle 
+                            center={riskPoint} 
+                            radius={radius} 
+                            pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: 0.4 }} 
+                        />
+                        )
+                    }
+
+                    {
+                        allReports.map((report) => {
+                            return (
+                                <Circle 
+                                key={report._id}
+                                center={[report.latitude, report.longitude]} 
+                                radius={report.radius} 
+                                pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: 0.4 }} 
+                                />
+                            )
+                        })
+                    }
                 </MapContainer>
         </div>
     )
