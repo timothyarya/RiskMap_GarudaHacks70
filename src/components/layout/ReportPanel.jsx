@@ -19,7 +19,7 @@ export default function ReportPanel({value, setValue, loc, riskPointAvail, openM
 
                 <button
                 disabled={riskPointAvail === null}
-                className={`flex items-center justify-center bg-red-700 rounded-full p-3 px-5 hover:bg-red-600 transition-all duration-300 ease-in-out select-none disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`flex items-center justify-center bg-red-700 rounded-full p-3 px-5 hover:bg-red-600 transition-all duration-300 ease-in-out select-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer`}
                 onClick={() => openModal()}
                 >
                     Report

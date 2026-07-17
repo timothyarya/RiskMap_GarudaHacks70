@@ -135,14 +135,14 @@ export default function FormReportModal({
                 className="flex flex-row items-center justify-end p-2 gap-3"
                 >
                     <button
-                    className="flex items-center justify-center bg-neutral-900/60 rounded-full p-2 px-4 hover:bg-red-900/50 transition-all duration-300 ease-in-out"
+                    className="flex items-center justify-center bg-neutral-600/60 rounded-full p-2 px-4 hover:bg-red-800/30 transition-all duration-300 ease-in-out cursor-pointer"
                     onClick={closeModal}
                     >
                         Cancel
                     </button>
                     <button
                     type="submit"
-                    className="flex items-center justify-center bg-red-800/60 rounded-full p-2 px-4 hover:bg-red-700/50 transition-all duration-300 ease-in-out"
+                    className="flex items-center justify-center bg-red-600/60 rounded-full p-2 px-4 hover:bg-red-800/50 transition-all duration-300 ease-in-out cursor-pointer"
                     >
                         Report
                     </button>

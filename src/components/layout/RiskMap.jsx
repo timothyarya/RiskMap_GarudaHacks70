@@ -243,7 +243,7 @@ export default function RiskMap() {
             <button 
                 onClick={handleMyLocation}
                 disabled={isLocating}
-                className="fixed bottom-25 lg:bottom-10 right-6 lg:right-10 z-1000 bg-neutral-900/50 text-neutral-300 font-bold py-4 px-7 rounded-full border hover:bg-neutral-800/60 transition-all flex items-center justify-center text-2xl"
+                className="fixed bottom-25 lg:bottom-10 right-6 lg:right-10 z-10000 bg-neutral-900/50 text-neutral-300 font-bold py-4 px-7 rounded-full border hover:bg-neutral-800/60 transition-all flex items-center justify-center text-2xl cursor-pointer"
             >
                 𖡡
             </button>
