@@ -158,6 +158,32 @@ export default function RiskMap() {
 
                 {userLocation && <MapFlyTo coords={userLocation} />}
 
+                {userLocation && (
+                    <Circle 
+                        center={userLocation} 
+                        radius={2000}
+                        pathOptions={{ 
+                            color: 'blue', 
+                            fillColor: 'blue', 
+                            fillOpacity: 0.1,
+                            weight: 1,
+                            interactive: false
+                        }} 
+                        
+                    >
+                        <CircleMarker 
+                        center={userLocation} 
+                        radius={8} // Radius dalam hitungan pixel, bukan meter
+                        pathOptions={{ 
+                            color: 'blue', 
+                            fillColor: 'cyan', 
+                            fillOpacity: 1,
+                            weight: 5
+                        }} 
+                        />   
+                    </Circle>
+                )}
+
                 {allReports.map((report) => {
                     const priority = getRiskPriority(report.lastUpvotedAt)
 
@@ -191,32 +217,6 @@ export default function RiskMap() {
                         </Circle>
                     )
                 })}
-
-                {userLocation && (
-                    <Circle 
-                        center={userLocation} 
-                        radius={2000}
-                        pathOptions={{ 
-                            color: 'blue', 
-                            fillColor: 'blue', 
-                            fillOpacity: 0.1,
-                            weight: 1,
-                            interactive: false
-                        }} 
-                        
-                    >
-                        <CircleMarker 
-                        center={userLocation} 
-                        radius={8} // Radius dalam hitungan pixel, bukan meter
-                        pathOptions={{ 
-                            color: 'blue', 
-                            fillColor: 'cyan', 
-                            fillOpacity: 1,
-                            weight: 5
-                        }} 
-                        />   
-                    </Circle>
-                )}
             </MapContainer>
 
             <button 
