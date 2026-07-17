@@ -281,18 +281,19 @@ export default function RiskMap() {
                                 pathOptions={{ 
                                     color: 'blue', 
                                     fillColor: 'blue', 
-                                    fillOpacity: 0.15,
+                                    fillOpacity: 0.1,
                                     weight: 1 
                                 }} 
                                 
                             >
                                 <CircleMarker 
                                 center={userLocation} 
-                                radius={5} // Radius dalam hitungan pixel, bukan meter
+                                radius={8} // Radius dalam hitungan pixel, bukan meter
                                 pathOptions={{ 
-                                    color: 'red', 
-                                    fillColor: 'red', 
-                                    fillOpacity: 1 
+                                    color: 'blue', 
+                                    fillColor: 'cyan', 
+                                    fillOpacity: 1,
+                                    weight: 5
                                 }} 
                                 />   
                             </Circle>

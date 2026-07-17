@@ -11,7 +11,10 @@ export default function Toast() {
         >
             {
                 (toastType === "info") && (
-                    <ToastContainer />
+                    <ToastContainer 
+                    message={message}
+                    color={color}
+                    />
                 )
             }
             {

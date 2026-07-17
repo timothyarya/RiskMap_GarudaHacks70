@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from "react"
-import { MapContainer, Circle, TileLayer, useMapEvents, Popup, useMap } from "react-leaflet"
+import { MapContainer, Circle, TileLayer, useMapEvents, Popup, useMap, CircleMarker } from "react-leaflet"
 // import Toast from "./Toast"
 import { useToast } from "@/store/useToastStore"
 import 'leaflet/dist/leaflet.css'
@@ -47,7 +47,6 @@ const getRiskPriority = (lastUpvotedAt) => {
     else if (timeDiffMinutes < 60) return { color: "orange", label: "Bahaya Sedang" }
     else return { color: "green", label: "Bahaya Rendah" }
 }
-
 
 export default function RiskMap() {
     const [riskPoint, setRiskPoint] = useState(null)
@@ -112,8 +111,10 @@ export default function RiskMap() {
             })
 
             if (response.ok) {
-                alert("Upvote Berhasil. Status area bahaya diupdate")
-                window.location.reload()
+                showToast("Upvote berhasil ditambahkan.", "info", "blue")
+                setTimeout(() => {
+                    window.location.reload()
+                }, 500);
             }
         } catch (error) {
             console.error(error)
@@ -174,16 +175,16 @@ export default function RiskMap() {
                         >
                             <Popup>
                                 <h1 className="font-bold text-lg">{report.category}</h1>
-                                <h2>{report.location}</h2>
+                                <h2 className="">{report.location}</h2>
                                 <p>{`"${report.description}"`}</p>
                                 <div
                                 className="flex flex-row gap-2 items-center justify-center"
                                 >
                                     <button
                                     onClick={() => handleUpvote(report._id)}   
-                                    className="bg-neutral-400 px-3 py-1 rounded-full" 
+                                    className="bg-neutral-200 px-2 pl-3 py-1 rounded-full" 
                                     >
-                                        {`Upvote (${report.upvotes})`}
+                                        Upvote <span className="bg-neutral-700 px-2 rounded-full text-neutral-50">{report.upvotes}</span>
                                     </button>
                                 </div>
                             </Popup>
@@ -194,10 +195,26 @@ export default function RiskMap() {
                 {userLocation && (
                     <Circle 
                         center={userLocation} 
-                        radius={30}
-                        pathOptions={{ color: 'blue', fillColor: 'blue', fillOpacity: 0.8 }} 
+                        radius={2000}
+                        pathOptions={{ 
+                            color: 'blue', 
+                            fillColor: 'blue', 
+                            fillOpacity: 0.1,
+                            weight: 1,
+                            interactive: false
+                        }} 
+                        
                     >
-                        <Popup>Lokasi Anda Saat Ini</Popup>
+                        <CircleMarker 
+                        center={userLocation} 
+                        radius={8} // Radius dalam hitungan pixel, bukan meter
+                        pathOptions={{ 
+                            color: 'blue', 
+                            fillColor: 'cyan', 
+                            fillOpacity: 1,
+                            weight: 5
+                        }} 
+                        />   
                     </Circle>
                 )}
             </MapContainer>
