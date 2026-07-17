@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useCallback } from "react"
-import { MapContainer, Circle, TileLayer, useMapEvents, useMap, Popup } from "react-leaflet"
+import { MapContainer, Circle, TileLayer, useMapEvents, useMap, Popup, CircleMarker } from "react-leaflet"
 import ReportPanel from "./ReportPanel"
 import FormReportModal from "./FormReportModal"
 // import Toast from "./Toast"
@@ -29,10 +29,10 @@ function MapFlyTo({ coords }) {
     return null;
 }
 
-function LocationSelector({ setHazardCenter }) {
+function LocationSelector({ setRiskCenter }) {
     useMapEvents({
         click(e) {
-            setHazardCenter(e.latlng)
+            setRiskCenter(e.latlng)
         },
     })
     return null;
@@ -61,6 +61,24 @@ export default function RiskMap() {
     const [userLocation, setUserLocation] = useState(null)
     const [isLocating, setIsLocating] = useState(false)
     const showToast = useToast((state) => state.showToast)
+
+    const handleSetRiskPoint = (point) => {
+        if (!userLocation) {
+            showToast("Harap tunggu hingga lokasi Anda ditemukan.", "warning", "orange");
+            return;
+        }
+
+        const userLat = userLocation[0];
+        const userLng = userLocation[1];
+
+        const distance = calculateDistance(point.lat, point.lng, userLat, userLng)
+
+        if (distance > 2000) {
+            showToast("Jarak titik melebih 2000m dari lokasi anda.", "warning", "red")
+        } else {
+            setRiskPoint(point)
+        }
+    }
     
     const handleMyLocation = (fetchedReports = null) => {
         setIsLocating(true)
@@ -89,10 +107,8 @@ export default function RiskMap() {
 
             if (inDangerZones.length > 0) {
                 showToast("Anda berada di zona bahaya", "warning", "red")
-                // alert(`You are in danger zones: ${inDangerZones.join(', ')}`)
             } else {
                 showToast("Anda berada di zona aman", "warning", "green")
-                // alert('You are not in any danger zones.')
             }
             
             setIsLocating(false)
@@ -126,7 +142,6 @@ export default function RiskMap() {
     }
 
     const handleSubmit = async (e) => {
-        // e.preventDefault()
         const formData = new FormData(e.target)
         const category = formData.get('category')
 
@@ -139,7 +154,6 @@ export default function RiskMap() {
             radius: radius
         }
 
-        // console.log(finalData)
         try {
             const response = await fetch('/api/reports', {
                 method: 'POST',
@@ -227,7 +241,7 @@ export default function RiskMap() {
                         attribution='&copy; OpenStreetMap contributors'
                     />
                     
-                    <LocationSelector setHazardCenter={setRiskPoint} />
+                    <LocationSelector setRiskCenter={(point) => handleSetRiskPoint(point)} />
 
                     {userLocation && <MapFlyTo coords={userLocation} />}
 
@@ -263,10 +277,24 @@ export default function RiskMap() {
                         {userLocation && (
                             <Circle 
                                 center={userLocation} 
-                                radius={30}
-                                pathOptions={{ color: 'blue', fillColor: 'blue', fillOpacity: 0.8 }} 
+                                radius={2000}
+                                pathOptions={{ 
+                                    color: 'blue', 
+                                    fillColor: 'blue', 
+                                    fillOpacity: 0.15,
+                                    weight: 1 
+                                }} 
+                                
                             >
-                                <Popup>Lokasi Anda Saat Ini</Popup>
+                                <CircleMarker 
+                                center={userLocation} 
+                                radius={5} // Radius dalam hitungan pixel, bukan meter
+                                pathOptions={{ 
+                                    color: 'red', 
+                                    fillColor: 'red', 
+                                    fillOpacity: 1 
+                                }} 
+                                />   
                             </Circle>
                         )}
                 </MapContainer>

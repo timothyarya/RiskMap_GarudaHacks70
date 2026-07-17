@@ -8,10 +8,10 @@ export default function Navbar() {
 
     return (
         <nav
-        className="fixed w-full flex flex-row left-0 bottom-1 lg:bottom-5 bg-transparent items-center justify-center z-99 font-bold font-sans text-lg"
+        className="fixed w-full flex flex-row left-0 bottom-5 bg-transparent items-center justify-center z-99 font-bold font-sans text-lg"
         >
             <div
-            className="flex flex-row rounded-full bg-neutral-900/50 gap-2 border border-white/20 p-2 backdrop-blur-xs"
+            className="flex flex-row rounded-full bg-neutral-900/50 gap-2 border border-white/20 p-2 backdrop-blur-xs scale-100 lg:scale-100"
             >
                 {
                     pagelist.map((page) => {

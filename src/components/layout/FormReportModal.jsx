@@ -14,14 +14,14 @@ export default function FormReportModal({
 }) {
     return (
         <div
-        className="fixed z-100 bg-neutral-900/70 w-full h-screen flex flex-col items-center justify-center"
+        className="fixed z-99999 bg-neutral-900/70 w-full h-screen flex flex-col items-center justify-center"
         >
             <form
             onSubmit={(e) => {
                 e.preventDefault()
                 submitHandler(e)
             }}
-            className="flex flex-col rounded-3xl bg-neutral-900/50 border border-white/20 backdrop-blur-xs items-stretch justify-center gap-5 p-6 transition-all duration-300 ease-in-out w-1/3"
+            className="flex flex-col rounded-3xl bg-neutral-900/50 border border-white/20 backdrop-blur-xs items-stretch justify-center gap-5 p-6 transition-all duration-300 ease-in-out w-[90%] lg:w-1/3"
             >
                 {/* Form Header */}
                 <div
