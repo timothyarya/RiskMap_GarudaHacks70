@@ -6,7 +6,7 @@ import ReportPanel from "./ReportPanel"
 import FormReportModal from "./FormReportModal"
 // import Toast from "./Toast"
 import { useToast } from "@/store/useToastStore"
-import 'leaflet/dist/leaflet.css'
+// import 'leaflet/dist/leaflet.css'
 
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
     const R = 6371e3; // Radius bumi dalam meter
@@ -119,7 +119,7 @@ export default function RiskMap() {
             alert(`Error: ${error.message}`);
             setIsLocating(false)
         },
-        { enableHignAccuracy: true }
+        { enableHighAccuracy: true }
         )
     }
 
@@ -237,7 +237,7 @@ export default function RiskMap() {
                 <MapContainer 
                     center={[-6.200000, 106.816666]}
                     zoom={13} 
-                    className="h-screen z-0 rounded-2xl"
+                    className="h-screen rounded-2xl"
                 >
                     <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

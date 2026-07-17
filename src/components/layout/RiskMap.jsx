@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react"
 import { MapContainer, Circle, TileLayer, useMapEvents, Popup, useMap, CircleMarker } from "react-leaflet"
 // import Toast from "./Toast"
 import { useToast } from "@/store/useToastStore"
-import 'leaflet/dist/leaflet.css'
+// import 'leaflet/dist/leaflet.css'
 
 // Fungsi untuk menghitung jarak (dalam meter) antara dua titik koordinat
 const calculateDistance = (lat1, lon1, lat2, lon2) => {
@@ -96,7 +96,7 @@ export default function RiskMap() {
             alert(`Error: ${error.message}`);
             setIsLocating(false)
         },
-        { enableHignAccuracy: true }
+        { enableHighAccuracy: true }
         )
     }
 
@@ -149,7 +149,7 @@ export default function RiskMap() {
             <MapContainer 
                 center={[-6.200000, 106.816666]} // Default ke Jakarta
                 zoom={13} 
-                className="rounded-2xl h-screen z-0"
+                className="rounded-2xl h-screen"
             >
                 <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
