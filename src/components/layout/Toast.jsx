@@ -1,10 +1,13 @@
 'use client'
 import ToastContainer from "../ui/ToastContainer"
+import { useToast } from "@/store/useToastStore"
 
-export default function Toast({ color, toastType, text }) {
+export default function Toast() {
+    const { message, toastType, color, isOpen } = useToast()
+
     return (
         <div
-        fixed z-9999 top-5 left-0 w-full flex flex-row items-center justify-center
+        className={`fixed z-9999 top-5 left-0 w-full flex-row items-center justify-center ${isOpen ? "flex" : "hidden"}`}
         >
             {
                 (toastType === "info") && (
@@ -14,7 +17,7 @@ export default function Toast({ color, toastType, text }) {
             {
                 (toastType === "warning") && (
                     <ToastContainer 
-                    text={text}
+                    message={message}
                     color={color}
                     />
                 )

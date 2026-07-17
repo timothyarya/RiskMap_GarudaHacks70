@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react"
 import { MapContainer, Circle, TileLayer, useMapEvents, Popup, useMap } from "react-leaflet"
-import Toast from "./Toast"
+// import Toast from "./Toast"
+import { useToast } from "@/store/useToastStore"
 import 'leaflet/dist/leaflet.css'
 
 // Fungsi untuk menghitung jarak (dalam meter) antara dua titik koordinat
@@ -54,9 +55,9 @@ export default function RiskMap() {
     const [allReports, setAllReports] = useState([])
     const [userLocation, setUserLocation] = useState(null)
     const [isLocating, setIsLocating] = useState(false)
+    const showToast = useToast((state) => state.showToast)
     
-    
-    const handleMyLocation = () => {
+    const handleMyLocation = (fetchedReports = null) => {
         setIsLocating(true)
 
         if (!navigator.geolocation) {
@@ -65,6 +66,8 @@ export default function RiskMap() {
             return;
         }
 
+        const reportsToUse = Array.isArray(fetchedReports) ? fetchedReports : allReports;
+
         navigator.geolocation.getCurrentPosition((pos) => {
             const lat = pos.coords.latitude
             const lng = pos.coords.longitude
@@ -72,7 +75,7 @@ export default function RiskMap() {
 
             let inDangerZones = []
             
-            allReports.forEach(report => {
+            reportsToUse.forEach(report => {
                 const dist = calculateDistance(lat, lng, report.latitude, report.longitude)
                 if (dist <= report.radius) {
                     inDangerZones.push(report.category)
@@ -80,8 +83,10 @@ export default function RiskMap() {
             })
 
             if (inDangerZones.length > 0) {
+                showToast("Anda berada di zona bahaya", "warning", "red")
                 // alert(`You are in danger zones: ${inDangerZones.join(', ')}`)
             } else {
+                showToast("Anda berada di zona aman", "warning", "green")
                 // alert('You are not in any danger zones.')
             }
             
@@ -127,13 +132,13 @@ export default function RiskMap() {
                 const result = await response.json();
                 if (response.ok) {
                     setAllReports(result.data);
+                    handleMyLocation(result.data)
                 }
             } catch (error) {
                 console.error('Error fetching reports:', error);
             }
         }
         fetchReports();
-        handleMyLocation()
     }, [])
     
     return (
