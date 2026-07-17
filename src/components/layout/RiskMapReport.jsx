@@ -84,7 +84,8 @@ export default function RiskMap() {
         setIsLocating(true)
 
         if (!navigator.geolocation) {
-            alert('Geolocation is not supported by this browser.');
+            showToast("Geolocation is not supported by this browser.", "info", "yellow")
+            // alert('Geolocation is not supported by this browser.');
             setIsLocating(false)
             return;
         }
@@ -164,12 +165,14 @@ export default function RiskMap() {
             })
 
             if (response.ok) {
-                alert('Report submitted successfully to MongoDB');
+                showToast("Report Submitted!", "info", "blue")
+                // alert('Report submitted successfully to MongoDB');
                 setRiskPoint(null)
                 setIsModalOpen(false)
                 setDescription('')
             } else {
-                alert('Failed to submit report to MongoDB');
+                showToast("Failed to submit report.", "info", "red")
+                // alert('Failed to submit report to MongoDB');
             }
         } catch (error) {
             console.error("Error submitting report:", error);
