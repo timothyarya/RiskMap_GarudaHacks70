@@ -167,7 +167,8 @@ export default function RiskMap() {
                             fillColor: 'blue', 
                             fillOpacity: 0.1,
                             weight: 1,
-                            interactive: false
+                            interactive: false,
+                            className: "pointer-events-none"
                         }} 
                         
                     >
@@ -178,7 +179,9 @@ export default function RiskMap() {
                             color: 'blue', 
                             fillColor: 'cyan', 
                             fillOpacity: 1,
-                            weight: 5
+                            weight: 5,
+                            interactive: false,
+                            className: "pointer-events-none"
                         }} 
                         />   
                     </Circle>
