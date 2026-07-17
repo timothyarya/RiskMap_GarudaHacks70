@@ -79,7 +79,7 @@ export default function RiskMap() {
                 const dist = calculateDistance(lat, lng, report.latitude, report.longitude)
                 if (dist <= report.radius) {
                     inDangerZones.push(report.category)
-                    setMyLocationToastPriority(getRiskPriority(reportsToUse.lastUpvotedAt).color)
+                    setMyLocationToastPriority(getRiskPriority(report.lastUpvotedAt).color)
                 }
             })
 
