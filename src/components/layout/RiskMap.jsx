@@ -54,7 +54,7 @@ export default function RiskMap() {
     const [allReports, setAllReports] = useState([])
     const [userLocation, setUserLocation] = useState(null)
     const [isLocating, setIsLocating] = useState(false)
-    const [myLocationToastPriority, setMyLocationToastPriority] = useState("")
+    // const [myLocationToastPriority, setMyLocationToastPriority] = useState(null)
     const showToast = useToast((state) => state.showToast)
     
     const handleMyLocation = (fetchedReports = null) => {
@@ -74,21 +74,31 @@ export default function RiskMap() {
             setUserLocation([lat, lng])
 
             let inDangerZones = []
+            let highestReportPriority = null
             
             reportsToUse.forEach(report => {
                 const dist = calculateDistance(lat, lng, report.latitude, report.longitude)
                 if (dist <= report.radius) {
                     inDangerZones.push(report.category)
-                    setMyLocationToastPriority(getRiskPriority(report.lastUpvotedAt).color)
+                    const priority = getRiskPriority(report.lastUpvotedAt)
+                    if (highestReportPriority == null) {
+                        highestReportPriority = priority.color
+                    } else if (highestReportPriority == "green") {
+                        highestReportPriority = priority.color
+                    } else if (highestReportPriority == "orange") {
+                        highestReportPriority = priority.color
+                    }
                 }
             })
 
             if (inDangerZones.length > 0) {
-                if (myLocationToastPriority === "red") {
+                // showToast("Anda berada di zona bahaya", "warning", "red")
+                // showToast("tes toast", "warning", "red")
+                if (highestReportPriority === "red") {
                     showToast("Anda berada di Zona Bahaya Tingkat Tinggi", "warning", "red")
-                } else if (myLocationToastPriority === "orange") {
+                } else if (highestReportPriority === "orange") {
                     showToast("Anda berada di Zona Bahaya Tingkat Sedang", "warning", "yellow")
-                } else if (myLocationToastPriority === "green") {
+                } else if (highestReportPriority === "green") {
                     showToast("Anda berada di Zona Bahaya Tingkat Rendah", "warning", "green")
                 }
             } else {

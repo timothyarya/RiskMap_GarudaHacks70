@@ -7,7 +7,7 @@ export default function ToastContainer({ message, color }) {
     useEffect(() => {
         const setColor = () => {
             if (color === "red") setColorGroup("bg-red-700 text-neutral-100") 
-            else if (color === "yellow") setColorGroup("bg-amber-300 text-neutral-300")
+            else if (color === "yellow") setColorGroup("bg-amber-500 text-neutral-200")
             else if (color === "green") setColorGroup("bg-green-800 text-neutral-100")
             else if (color === "blue") setColorGroup("bg-blue-500 text-neutral-100")
         }
