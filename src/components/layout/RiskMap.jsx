@@ -1,7 +1,8 @@
 'use client'
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { MapContainer, Circle, TileLayer, useMapEvents, Popup, useMap } from "react-leaflet"
+import Toast from "./Toast"
 import 'leaflet/dist/leaflet.css'
 
 // Fungsi untuk menghitung jarak (dalam meter) antara dua titik koordinat
@@ -35,34 +36,26 @@ function LocationSelector({ setHazardCenter }) {
     return null;
 }
 
+// atur tingkat bahaya berdasarkan waktu terakhir di upvote
+const getRiskPriority = (lastUpvotedAt) => {
+    const timeDiffMilisecond = Date.now() - new Date(lastUpvotedAt).getTime()
+    const timeDiffMinutes = Math.floor(timeDiffMilisecond / (60 * 1000))
+    console.log(timeDiffMinutes)
+
+    if (timeDiffMinutes < 30) return { color: "red", label: "Bahaya Tinggi" }
+    else if (timeDiffMinutes < 60) return { color: "orange", label: "Bahaya Sedang" }
+    else return { color: "green", label: "Bahaya Rendah" }
+}
+
+
 export default function RiskMap() {
     const [riskPoint, setRiskPoint] = useState(null)
     const [radius, setRadius] = useState(500)
     const [allReports, setAllReports] = useState([])
     const [userLocation, setUserLocation] = useState(null)
     const [isLocating, setIsLocating] = useState(false)
-
-    useEffect(() => {
-        const fetchReports = async () => {
-            try {
-                const response = await fetch('/api/reports', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
-                });
-                const result = await response.json();
-                if (response.ok) {
-                    setAllReports(result.data);
-                }
-            } catch (error) {
-                console.error('Error fetching reports:', error);
-            }
-        }
-
-        fetchReports();
-    }, [])
-
+    
+    
     const handleMyLocation = () => {
         setIsLocating(true)
 
@@ -78,7 +71,7 @@ export default function RiskMap() {
             setUserLocation([lat, lng])
 
             let inDangerZones = []
-
+            
             allReports.forEach(report => {
                 const dist = calculateDistance(lat, lng, report.latitude, report.longitude)
                 if (dist <= report.radius) {
@@ -87,22 +80,62 @@ export default function RiskMap() {
             })
 
             if (inDangerZones.length > 0) {
-                alert(`You are in danger zones: ${inDangerZones.join(', ')}`)
+                // alert(`You are in danger zones: ${inDangerZones.join(', ')}`)
             } else {
-                alert('You are not in any danger zones.')
+                // alert('You are not in any danger zones.')
             }
-
+            
             setIsLocating(false)
-
+            
         },
         (error) => {
             alert(`Error: ${error.message}`);
             setIsLocating(false)
         },
         { enableHignAccuracy: true }
-    )
+        )
     }
 
+    const handleUpvote = async (reportId) => {
+        try {
+            const response = await fetch('/api/reports', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type' : 'application/json'
+                },
+                body: JSON.stringify({ reportId: reportId })
+            })
+
+            if (response.ok) {
+                alert("Upvote Berhasil. Status area bahaya diupdate")
+                window.location.reload()
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    }
+    
+    useEffect(() => {
+        const fetchReports = async () => {
+            try {
+                const response = await fetch('/api/reports', {
+                    method: 'GET', 
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                const result = await response.json();
+                if (response.ok) {
+                    setAllReports(result.data);
+                }
+            } catch (error) {
+                console.error('Error fetching reports:', error);
+            }
+        }
+        fetchReports();
+        handleMyLocation()
+    }, [])
+    
     return (
         <div
         className="flex flex-col gap-5 w-full"
@@ -120,17 +153,34 @@ export default function RiskMap() {
                 {userLocation && <MapFlyTo coords={userLocation} />}
 
                 {allReports.map((report) => {
+                    const priority = getRiskPriority(report.lastUpvotedAt)
+
                     return (
                         <Circle 
                         key={report._id}
                         center={[report.latitude, report.longitude]} 
                         radius={report.radius} 
-                        pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: 0.4 }} 
+                        pathOptions={{ 
+                            color: priority.color, 
+                            fillColor: priority.color, 
+                            fillOpacity: 0.4,
+                            weight: report.upvotes > 30 ? 5 : report.upvotes * 0.15
+                        }} 
                         >
                             <Popup>
                                 <h1 className="font-bold text-lg">{report.category}</h1>
                                 <h2>{report.location}</h2>
                                 <p>{`"${report.description}"`}</p>
+                                <div
+                                className="flex flex-row gap-2 items-center justify-center"
+                                >
+                                    <button
+                                    onClick={() => handleUpvote(report._id)}   
+                                    className="bg-neutral-400 px-3 py-1 rounded-full" 
+                                    >
+                                        {`Upvote (${report.upvotes})`}
+                                    </button>
+                                </div>
                             </Popup>
                         </Circle>
                     )

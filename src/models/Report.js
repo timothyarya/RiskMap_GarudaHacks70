@@ -8,7 +8,8 @@ const reportSchema = new Schema(
         radius: { type: Number, required: true },
         location: { type: String, required: true },
         category: { type: String, required: true },
-        date: { type: Date, default: Date.now },
+        upvotes: { type: Number, required: true, default: 1 },
+        lastUpvotedAt: { type: Date, required: true, default: Date.now },
     },
     {
         timestamps: true

@@ -27,7 +27,11 @@ export async function POST(req) {
 export async function GET() {
     try {
         await connectMongoDB()
-        const reports = await Report.find({})
+        const pastNinetyMinutes = new Date(Date.now() - 90 * 60 * 1000)
+
+        const reports = await Report.find({
+            lastUpvotedAt: { $gte: pastNinetyMinutes }
+        })
 
         return NextResponse.json(
             { message: "Risk Report fetched successfully", data: reports },
@@ -38,5 +42,21 @@ export async function GET() {
             { message: "Failed to fetch Risk Report" },
             { status: 500 }
         )
+    }
+}
+
+export async function PUT(req) {
+    try {
+        await connectMongoDB()
+        const { reportId } = await req.json()
+
+        await Report.findByIdAndUpdate(reportId, {
+            $inc: { upvotes: 1 },
+            lastUpvotedAt: Date.now()
+        })
+
+        return NextResponse.json({ message: "Sukses upvote" }, { status: 200 })
+    } catch (error) {
+        return NextResponse.json({ message: "Gagal upvote" }, { status: 500 })
     }
 }
