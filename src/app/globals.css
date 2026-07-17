@@ -25,3 +25,28 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ================================================== */
+/* FIX LEAFLET SVG CLICKS UNTUK VERCEL & TAILWIND V4  */
+/* ================================================== */
+
+/* 1. Paksa area yang interaktif agar bisa diklik */
+path.leaflet-interactive {
+    pointer-events: visiblePainted !important;
+    cursor: pointer !important;
+}
+
+/* 2. Pastikan lingkaran biru (yang interactive: false) benar-benar tembus klik */
+path:not(.leaflet-interactive) {
+    pointer-events: none !important;
+}
+
+/* 3. Pastikan Popup selalu muncul paling depan (di atas segalanya) */
+.leaflet-popup-pane {
+    z-index: 9999 !important;
+}
+
+/* 4. Mencegah bug SVG container dari Tailwind */
+.leaflet-overlay-pane svg {
+    max-width: none !important;
+}
