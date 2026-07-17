@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from "react"
-import { MapContainer, Circle, TileLayer, useMapEvents, Popup, useMap, CircleMarker } from "react-leaflet"
+import { MapContainer, Circle, TileLayer, useMapEvents, Popup, useMap, CircleMarker, Pane } from "react-leaflet"
 // import Toast from "./Toast"
 import { useToast } from "@/store/useToastStore"
 // import 'leaflet/dist/leaflet.css'
@@ -158,68 +158,70 @@ export default function RiskMap() {
 
                 {userLocation && <MapFlyTo coords={userLocation} />}
 
-                {userLocation && (
-                    <Circle 
-                        center={userLocation} 
-                        radius={2000}
-                        pathOptions={{ 
-                            color: 'blue', 
-                            fillColor: 'blue', 
-                            fillOpacity: 0.1,
-                            weight: 1,
-                            interactive: false,
-                            className: "pointer-events-none"
-                        }} 
-                        
-                    >
-                        <CircleMarker 
-                        center={userLocation} 
-                        radius={8} // Radius dalam hitungan pixel, bukan meter
-                        pathOptions={{ 
-                            color: 'blue', 
-                            fillColor: 'cyan', 
-                            fillOpacity: 1,
-                            weight: 5,
-                            interactive: false,
-                            className: "pointer-events-none"
-                        }} 
-                        />   
-                    </Circle>
-                )}
-
-                {allReports.map((report) => {
-                    const priority = getRiskPriority(report.lastUpvotedAt)
-
-                    return (
+                <Pane name="user-location-pane" style={{ zIndex: 2000, pointerEvents: 'none' }}>
+                    {userLocation && (
                         <Circle 
-                        key={report._id}
-                        center={[report.latitude, report.longitude]} 
-                        radius={report.radius} 
-                        pathOptions={{ 
-                            color: priority.color, 
-                            fillColor: priority.color, 
-                            fillOpacity: 0.4,
-                            weight: report.upvotes > 30 ? 5 : report.upvotes * 0.15
-                        }} 
+                            center={userLocation} 
+                            radius={2000}
+                            pathOptions={{ 
+                                color: 'blue', 
+                                fillColor: 'blue', 
+                                fillOpacity: 0.1,
+                                weight: 1,
+                                interactive: false
+                            }} 
+                            
                         >
-                            <Popup>
-                                <h1 className="font-bold text-lg">{report.category}</h1>
-                                <h2 className="">{report.location}</h2>
-                                <p>{`"${report.description}"`}</p>
-                                <div
-                                className="flex flex-row gap-2 items-center justify-center"
-                                >
-                                    <button
-                                    onClick={() => handleUpvote(report._id)}   
-                                    className="bg-neutral-200 px-2 pl-3 py-1 rounded-full" 
-                                    >
-                                        Upvote <span className="bg-neutral-700 px-2 rounded-full text-neutral-50">{report.upvotes}</span>
-                                    </button>
-                                </div>
-                            </Popup>
+                            <CircleMarker 
+                            center={userLocation} 
+                            radius={8} // Radius dalam hitungan pixel, bukan meter
+                            pathOptions={{ 
+                                color: 'blue', 
+                                fillColor: 'cyan', 
+                                fillOpacity: 1,
+                                weight: 5,
+                                interactive: false
+                            }} 
+                            />   
                         </Circle>
-                    )
-                })}
+                    )}
+                </Pane>
+
+                <Pane name="reports-pane" style={{ zIndex: 2001 }}>
+                    {allReports.map((report) => {
+                        const priority = getRiskPriority(report.lastUpvotedAt)
+
+                        return (
+                            <Circle 
+                            key={report._id}
+                            center={[report.latitude, report.longitude]} 
+                            radius={report.radius} 
+                            pathOptions={{ 
+                                color: priority.color, 
+                                fillColor: priority.color, 
+                                fillOpacity: 0.4,
+                                weight: report.upvotes > 30 ? 5 : report.upvotes * 0.15
+                            }} 
+                            >
+                                <Popup>
+                                    <h1 className="font-bold text-lg">{report.category}</h1>
+                                    <h2 className="">{report.location}</h2>
+                                    <p>{`"${report.description}"`}</p>
+                                    <div
+                                    className="flex flex-row gap-2 items-center justify-center"
+                                    >
+                                        <button
+                                        onClick={() => handleUpvote(report._id)}   
+                                        className="bg-neutral-200 px-2 pl-3 py-1 rounded-full" 
+                                        >
+                                            Upvote <span className="bg-neutral-700 px-2 rounded-full text-neutral-50">{report.upvotes}</span>
+                                        </button>
+                                    </div>
+                                </Popup>
+                            </Circle>
+                        )
+                    })}
+                </Pane>
             </MapContainer>
 
             <button 
