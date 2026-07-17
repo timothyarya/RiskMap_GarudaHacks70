@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, use } from "react"
 import { MapContainer, Circle, TileLayer, useMapEvents, Popup, useMap, CircleMarker, Pane } from "react-leaflet"
 // import Toast from "./Toast"
 import { useToast } from "@/store/useToastStore"
@@ -54,6 +54,7 @@ export default function RiskMap() {
     const [allReports, setAllReports] = useState([])
     const [userLocation, setUserLocation] = useState(null)
     const [isLocating, setIsLocating] = useState(false)
+    const [myLocationToastPriority, setMyLocationToastPriority] = useState("")
     const showToast = useToast((state) => state.showToast)
     
     const handleMyLocation = (fetchedReports = null) => {
@@ -78,15 +79,20 @@ export default function RiskMap() {
                 const dist = calculateDistance(lat, lng, report.latitude, report.longitude)
                 if (dist <= report.radius) {
                     inDangerZones.push(report.category)
+                    setMyLocationToastPriority(getRiskPriority(reportsToUse.lastUpvotedAt).color)
                 }
             })
 
             if (inDangerZones.length > 0) {
-                showToast("Anda berada di zona bahaya", "warning", "red")
-                // alert(`You are in danger zones: ${inDangerZones.join(', ')}`)
+                if (myLocationToastPriority === "red") {
+                    showToast("Anda berada di Zona Bahaya Tingkat Tinggi", "warning", "red")
+                } else if (myLocationToastPriority === "orange") {
+                    showToast("Anda berada di Zona Bahaya Tingkat Sedang", "warning", "yellow")
+                } else if (myLocationToastPriority === "green") {
+                    showToast("Anda berada di Zona Bahaya Tingkat Rendah", "warning", "green")
+                }
             } else {
                 showToast("Anda berada di zona aman", "warning", "green")
-                // alert('You are not in any danger zones.')
             }
             
             setIsLocating(false)
@@ -174,7 +180,7 @@ export default function RiskMap() {
                         >
                             <CircleMarker 
                             center={userLocation} 
-                            radius={8} // Radius dalam hitungan pixel, bukan meter
+                            radius={8} 
                             pathOptions={{ 
                                 color: 'blue', 
                                 fillColor: 'cyan', 
