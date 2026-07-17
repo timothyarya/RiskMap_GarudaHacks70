@@ -203,7 +203,7 @@ export default function RiskMap() {
                                 weight: report.upvotes > 30 ? 5 : report.upvotes * 0.15
                             }} 
                             >
-                                <Popup>
+                                <Popup pane="popupPane">
                                     <h1 className="font-bold text-lg">{report.category}</h1>
                                     <h2 className="">{report.location}</h2>
                                     <p>{`"${report.description}"`}</p>
